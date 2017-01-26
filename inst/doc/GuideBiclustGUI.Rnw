@@ -27,7 +27,7 @@
 \newcommand{\HRule}{\rule{\linewidth}{0.5mm}}
 %\usepackage{Sweave}
 
-\title{The BiclustGUI R Package - 1.0.4}
+\title{The BiclustGUI R Package - 1.1.0}
 \author{De Troyer Ewoud}
 \date{}
 \begin{document}
@@ -402,6 +402,8 @@ will appear after loading the plug-in.
 & \multirow{2}{*}{\texttt{s4vd}} & SSVD (Sparse Singular Value Decomposition) \\
 & & S4VD (SSVD incorporating stability correction) \\
 & & \\
+& \texttt{BiBitR} & Extracting bit-patterns from binary data \\
+& & \\
 \hline
 & & \\
 \multirow{3}{*}{{\it General Plots/Diagnostics}} & \texttt{BcDiag} & Bicluster
@@ -441,7 +443,9 @@ install.packages("superbiclust")
 install.packages("Rcmdr")
 install.packages("isa2")
 install.packages("s4vd")
+install.packages("BiBitR")
 install.packages("gplots")
+install.packages("viridis")
 \end{verbatim}
 \noindent while others are available in Bioconductor
 \begin{verbatim}
@@ -453,12 +457,15 @@ biocLite("rqubic")
 biocLite("BicARE")
 \end{verbatim}
 \noindent Once all R packages are installed we can install the GUI using the following
-code. You can either install the development version from the R-Forge repository
+code. You can either install the development version from the R-Forge/GitHub repository
 or the release version from the CRAN repositiry.
 \begin{verbatim}
-## Biclust GUI - In Development Version ##
+## Biclust GUI - In Development Version (R-Forge) ##
 install.packages("RcmdrPlugin.BiclustGUI",
 repos="http://R-Forge.R-project.org")
+## Biclust GUI - In Development Version (GitHub) ##
+install.packages("devtools") 
+devtools::install_github("ewouddt/RcmdrPlugin.BiclustGUI")
 ## Biclust GUI - Release Version ##
 install.packages("RcmdrPlugin.BiclustGUI")
 \end{verbatim}
@@ -592,11 +599,16 @@ was not included in a bicluster.\\
 Next, the following option will reorder the rows and columns of the matrix so
 the resulted biclusters are generally put more together. The algorithm to
 accomplish this was borrowed from the heatmap plot in the \verb|iBBiG| package.
-Finally, the last option will determine if row/column combinations in biclusters should also be colored even if the response was '0'. This is mostly helpfull when investigating
-binary data if for example you know the resulting biclusters might still
+The next option will determine if row/column combinations in biclusters should
+also be colored even if the response was '0'. This is mostly helpfull when investigating binary data if for example you know the resulting biclusters might still
 contain zeros (depending on the algorithm). In this case checking this option would show
-the full biclusters, but when unchecked, some fields of the biclusters might
-turn white.
+the full biclusters, but when unchecked, some blocks of the biclusters might
+turn white.\\
+\noindent Finally, the last option allows the user to highlight 1 single
+bicluster. This can be especially helpful after reordering the rows and columns
+which results in many overlapping parts. When highlighting the bicluster, it will be brought to
+the foreground and all other biclusters will become transparent as given by the
+opacity parameter.
 \\ \\
 Lastly, do take care that it is not possible to visualize overlapping biclusters
 that well in these 2D heatmaps. The biclusters are drawn in the order they
@@ -703,10 +715,25 @@ printed afterwards or not.)
 \end{figure}
 
 
+\subsubsection{Find Maximal Biclusters}
 
+The following window in Figure \ref{maxbc} allows the user to quickly to scan through a single biclustering result (selected in the list box), and retrieve which biclusters have the largest row, column and size (= row size $\cdot$ column size). 
 
+\begin{figure}[H]
+\centering
+\includegraphics[scale=0.4]{figures/MaxBC.png}
+\caption{{\it Find the Maximal Size Biclusters in a result}\label{maxbc}}
+\end{figure}
 
-\subsubsection{Save/Load}
+\noindent The {\it Top Number} parameter in this window determines how many top biclusters in each category (row/column/size) should be shown (excluding ties).
+
+\begin{figure}[H]
+\centering
+\includegraphics[scale=0.4]{figures/MaxBC_example.png}
+\caption{{\it Find the Maximal Size Biclusters - Example with \texttt{top=2}}\label{maxbc_example}}
+\end{figure}
+
+\subsubsection{Save/Load}\label{sec:SaveLoad}
 
 \noindent Another available option for the user is to {\it Save} a result from a
 certain method (as a \verb|RData| or \verb|rda| file) and to also {\it Load} it
@@ -1838,11 +1865,112 @@ columns for the possible penalty parameters. However note that if the pointwise
 error control was used, only the final selection probabilities (for the final
 penalty parameter) for the rows and columns will be plotted.
 
+\subsection{\texttt{BiBitR}-package}
+
+\subsubsection{BiBit with Noise Allowance}
+
+The BiBit algorithm, proposed in \citet{Rodriguez-Baena2011}, is a biclustering method for binary data. By converting the binary data to bit words, it is a very efficient algorithm in finding perfect biclusters (all 1's in the BC). The algorithm was slightly adapted in the \texttt{BiBitR} R package in order to also allow some noise in discovered biclusters.
+\\ \\
+The general steps of the BiBit algorithm go as following:
+\begin{enumerate}
+\item Binary data is encoded in bit words.
+\item Take a pair of rows as your starting point.
+\item Find the maximal overlap of 1's between these two rows and save this as a pattern/motif. You now have a bicluster of 2 rows and N columns in which N is the number of 1's in the motif.
+\item Check all remaining rows if they match this motif, {\it however} allow a specific amount of 0's in this matching as defined by the `noise` parameter. Those rows that match completely or those within the allowed noise range are added to bicluster.
+\item Go back to {\it Step 2} and repeat for all possible row pairs.
+\end{enumerate}
+
+\noindent Biclusters are only saved if they satisfy the \texttt{minr} (= minimum number of rows) and \texttt{minc} (= minimum number of columns) parameter settings and if the bicluster is not already contained completely within another bicluster.\\
+What you will end up with are biclusters not only consisting out of 1's, but biclusters in which 2 rows (the starting pair) are all 1's and in which the other rows could contain 0's (depending on the \texttt{noise} parameter).
+\\ \\
+For larger data, in order to avoid too many discovered biclusters as well as overhead issues in the algorithm, it is advised to put the \texttt{minr} and \texttt{minc} parameter sufficiently high.\\
+({\it Note:} The \texttt{BiBitR} package also contains a procedure to add extra columns to the discovered BiBit BC's. This was not included in the GUI, however more information can be found in the \texttt{bibit2} documentation of the \texttt{BiBitR} R package.)
+
+\begin{figure}[H]
+\centering
+\includegraphics[scale=0.5]{figures/bibit_clusttab.png}
+\caption{{\it BiBit Window - Clustering Tab}\label{bibit_clusttab}}
+\end{figure}
+
+\noindent Figure \ref{bibit_clusttab} shows the {\it Clustering Tab Window for BiBit}. The window contains an option to binarize the data as well as all parameters for the BiBit algorithm, namely \texttt{minr} (= minimum number of rows in a BC), \texttt{minc} (= minimum number of columns in a BC) and \texttt{noise} (= the allowed noise level). The \texttt{noise} parameter determines the amount of zero's allowed in the bicluster (i.e. in the extra added rows to the starting row pair) and can take on the following values:
+\begin{itemize}
+\item \texttt{noise=0}: No noise allowed. This gives the same result* as using
+the original BiBit algorithm.
+\item \verb|0<noise<1|: The noise parameter will be a noise percentage.
+The number of allowed 0's in a (extra) row in the bicluster will depend on the
+column size of the bicluster. More specifically \texttt{zeros\_allowed = ceiling(noise * columnsize)}. For example for \texttt{noise=0.10} and a bicluster column size of \texttt{5}, the number of allowed 0's would be \texttt{1}.
+\item \texttt{noise>=1}: The noise parameter will be the number of allowed 0's in a (extra) row in the bicluster independent from the column size of the bicluster. In this noise option, the noise parameter should be an integer.
+\end{itemize}
+
+
+\begin{figure}[H]
+\centering
+\includegraphics[scale=0.5]{figures/bibit_plotdiagtab.png}
+\caption{{\it BiBit Window - Plots \& Diagnostics Tab}\label{bibit_plotdiagtab}}
+\end{figure}
+
+\noindent The {\it Plots \& Diagnostics Tab for BiBit} in Figure
+\ref{bibit_plotdiagtab} is almost exactly the same as the window in Section \ref{sec:biclustplots} for the \texttt{biclust} package. The only difference being that the {\it Summary} button has been replaced by a {\it MaxBC Top} button which will tell you which Biclusters have the highest row, column and size (= row*column) dimension.
+
+\subsubsection{Using BiBit to find provided patterns}
+
+\noindent Normally you would apply BiBit (with/without noise) directly on the
+binary data.
+However due to the nature of the algorithm, namely starting an exhaustive search from each row-pair, 
+it is also possible to look for specific patterns of interest therefore
+decreasing the solution space and compation time.\\
+This more "directed" or "pattern-driven" version of the BiBit algorithm is
+implemented in the following {\it Bibit Patterns Window} in Figure
+\ref{bibit3_clusttab}.  It allows the user to only look for
+one or multiple full or sub patterns in their data.
+
+\begin{figure}[H]
+\centering
+\includegraphics[scale=0.5]{figures/bibit3_clusttab.png}
+\caption{{\it BiBit Patterns Window - Clustering Tab}\label{bibit3_clusttab}}
+\end{figure}
+
+\noindent The window contains the same BiBit Parameters and Binarization option
+as in Figure \ref{bibit_clusttab}. Additionally now also some parameters have to be set for
+the pattern(s) of interest. In the {\it Pattern Matrix} field, the name of a
+loaded or created matrix must be provided. This matrix is a (Number of Patterns
+$\times$ Number of Data Columns) matrix in which each row corresponds with a given pattern of interest.
+\\ \\
+Three types of Biclusters can be discovered based on the provided patterns:
+\begin{description}
+\item[$\bullet$ {\it Full Pattern: }]Bicluster which overlaps completely (within allowed noise levels) with the provided pattern. The column size of this bicluster is always equal to the number of 1's in the pattern.
+\item[$\bullet$ {\it Sub Pattern: }]Biclusters which overlap with a part of the
+provided pattern within allowed noise levels. 
+\item[$\bullet$ {\it Extended: }]Using the resulting biclusters from the full and sub patterns, other columns will be attempted to be added to the biclusters while keeping the noise as low as possible (the number of rows in the BC stays constant). Naturally the articially added pattern rows will not be taken into account with the noise levels as they are 0 in each other column. 
+The question which is attempted to be answered here is {\it Do the rows, which
+overlap partly or fully with the given pattern, have other similarities outside
+the given pattern?}
+\end{description}
+\noindent The 3 checkboxes in this window determine if {\it Sub Patterns} should
+be discovered (unchecked means decreased computation time), if the {\it Extend
+Columns} procedure should be applied and if {\it Combinations of Patterns}
+should also be investigated.
+
+\begin{figure}[H]
+\centering
+\includegraphics[scale=0.5]{figures/bibit3_plotdiagtab.png}
+\caption{{\it BiBit Patterns Window - Plots \& Diagnostics Tab}\label{bibit3_plotdiagtab}}
+\end{figure}
+
+\noindent In Figure \ref{bibit3_plotdiagtab} the {\it Plots \& Diagnostics Tab
+of BiBit Patterns} can be found. It contains a simple {\it Summary} button which will
+print which biclusters (and their dimensions) are discovered in the three
+types.\\
+Finally the window also provides a way to print one or more discovered
+biclusters with the added pattern of interest. You can decide which {\it
+Patterns} (e.g. \texttt{1,2}), which {\it Biclusters} (e.g. \texttt{1,2,3}) and
+also which types ({\it Full Pattern}, {\it Sub Pattern}, {\it Extended}) should
+be printed.
 
 \subsection{Diagnostic Packages}
 \subsubsection{\texttt{BcDiag}-package}
 The first implemented diagnostics package is \verb|BcDiag| which is compatible
-with \verb|biclust|, \verb|fabia| and \verb|isa2|. Since the output of \verb|iBBiG|
+with \verb|biclust|, \verb|BiBitR|, \verb|fabia| and \verb|isa2|. Since the output of \verb|iBBiG|
 is an extension of \verb|biclust|, the diagnostics will also work on this
 package.\\
 \verb|BcDiag|'s task is the visualisation of bicluster data which can be
@@ -1952,6 +2080,27 @@ about the `superbiclust' concept itself.
 \includegraphics[scale=0.5]{figures/superbiclust.png}
 \caption{{\it Superbiclust Window}\label{superbiclust}}
 \end{figure}
+\noindent {\bf Repeat 'Method' with LAST USED parameters, NOT last selected.}\\
+Inside this first box of the Superbiclust window, it is possible to repeat the
+selected method multiple times and then easily feed it into the superbiclust
+framework in addition to the original result. Pressing the {\it Run} button will
+repeat the analysis for the chosen {\it Number of Repeats} and save these
+results in a list object with the chosen name of {\it Object Name}. It is also possible to set a starting seed of
+this analysis in the {\it Starting Seed} field. Leaving this field empty will
+choose a random seed (and print which one).\\
+Note that the chosen parameters for these repeats will be the {\it last used}
+parameters, not the {\it currently selected}. This is to ensure that the chosen
+parameters do not result in an error or nonsensical output.\\
+After the analysis is complete, the object will automatically be pasted in the
+{\it Extra Data Input} field to introduce it into the superbiclust framework.\\
+Finally, note that this list object of biclustering results can also be saved as
+an .RData object through {\it 'Help \& Utilities', 'Save/Load'} (See Section
+\ref{sec:SaveLoad}). Saving multiple repeated analysis in either R objects or
+.RData files will also enable you to compare multiple parameter settings of a
+specific method. Simply repeat the analysis with multiple parameter choices,
+save these in different list objects, and then input these objects in the {\it
+Extra Data Input} field.
+\\ \\
 \noindent {\bf Extra Data Input}\\
 \noindent First of all, at the top of the window in Figure \ref{superbiclust},
 there is room to add other biclustering results objects which are loaded in the
@@ -1959,7 +2108,9 @@ R workspace. The format should be as in the given example:
 \verb|c('result1','result2')|. The easiest way to do this is to use the {\it
 Choose} button. This will open up a small new window in which the user can
 select those results of interest. After pressing {\it Ok}, they will be
-immediately filled in in the entry field.
+immediately filled in in the entry field.\\
+Note that result objects added in this field are always {\it in addition} to the
+result of the original analysis in the first tab.
 \\ \\
 \noindent {\bf Fabia Thresholds}\\
 \noindent In this small box, the user can set the thresholds for biclustering
@@ -2206,7 +2357,9 @@ be added inside the function itself.
   
   \item[$\bullet$ \texttt{methodseed}:] Logical value determining if there
   should be a seed box below the {\it Show Results} button. This will make sure
-  a \verb|set.seed()| is executed before the biclustering function.
+  a \verb|set.seed()| is executed before the biclustering function. Further,
+  methods with \texttt{methodseed==TRUE} will also have the feature enabled in
+  the superbiclust window to repeat the analysis multiple times.
   
   \item[$\bullet$ \texttt{bcdiag.comp} \& \texttt{superbiclust.comp} :] Logical
   value determining compatibility with the \verb|BcDiag| and \verb|superbiclust|
