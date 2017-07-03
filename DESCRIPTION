@@ -1,8 +1,8 @@
 Package: RcmdrPlugin.BiclustGUI
 Type: Package
 Title: 'Rcmdr' Plug-in GUI for Biclustering
-Version: 1.1.0
-Date: 2017-01-24
+Version: 1.1.1
+Date: 2017-07-03
 Author: De Troyer Ewoud, Otava Martin
 Maintainer: De Troyer Ewoud <ewoud.detroyer@uhasselt.be>
 Description: A plug-in for R Commander ('Rcmdr'). The package is a Graphical
@@ -21,13 +21,13 @@ Description: A plug-in for R Commander ('Rcmdr'). The package is a Graphical
     and 'Rcmdr' and are easy to fill in.
 License: GPL-3
 Depends: biclust, fabia, iBBiG,superbiclust(>= 1.1),BcDiag(>= 1.0.10),
-        rqubic, BicARE, s4vd, BiBitR(>= 0.2.0)
+        rqubic, BicARE, s4vd, BiBitR(>= 0.3.1)
 Imports: Rcmdr, tcltk, gplots, grDevices, graphics, methods, utils,
         viridis
 VignetteBuilder: knitr
 Suggests: knitr
 NeedsCompilation: no
-Packaged: 2017-01-25 15:29:45 UTC; lucp8394
+Packaged: 2017-07-03 09:20:58 UTC; lucp8394
 RoxygenNote: 5.0.1
 Repository: CRAN
-Date/Publication: 2017-01-26 01:09:25
+Date/Publication: 2017-07-03 10:25:28 UTC
