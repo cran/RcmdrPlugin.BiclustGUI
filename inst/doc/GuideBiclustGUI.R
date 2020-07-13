@@ -1,4 +1,4 @@
-## ----newmethod_script1,echo=TRUE,eval=FALSE------------------------------
+## ----newmethod_script1,echo=TRUE,eval=FALSE-----------------------------------
 #  newmethod_WINDOW <- function(){
 #  	
 #  	new.frames <- .initialize.new.frames()
@@ -40,7 +40,7 @@
 #  } # Note: The curly bracket is placed here for syntax reasons.
 #    #       It should be placed after the call of cluster_template.
 
-## ----newmethod_script2,eval=FALSE,echo=TRUE------------------------------
+## ----newmethod_script2,eval=FALSE,echo=TRUE-----------------------------------
 #  ########################
 #  #### CLUSTERING TAB ####
 #  ########################
@@ -65,7 +65,7 @@
 #  		    border=TRUE,grid.rows=grid.rows,grid.config=grid.config)
 #  
 
-## ----newmethod_script3,eval=FALSE,echo=TRUE------------------------------
+## ----newmethod_script3,eval=FALSE,echo=TRUE-----------------------------------
 #  ####################################
 #  #### PLOTTING & DIAGNOSTICS TAB ####
 #  ####################################
@@ -100,7 +100,7 @@
 #     methodsave=methodsave)
 #  }
 
-## ----plaid_script1,eval=FALSE,echo=TRUE----------------------------------
+## ----plaid_script1,eval=FALSE,echo=TRUE---------------------------------------
 #  #####################################################
 #  ## GENERAL INFORMATION ABOUT THE NEW METHOD/WINDOW ##
 #  #####################################################
@@ -119,7 +119,7 @@
 #  # Biclust only (Not for public use)
 #  extrabiclustplot <- TRUE
 
-## ----plaid_script2,eval=FALSE,echo=TRUE----------------------------------
+## ----plaid_script2,eval=FALSE,echo=TRUE---------------------------------------
 #  ### 2. CONFIGURING THE GRID ###
 #  grid.config <- .grid.matrix(input=input,c("toclusterframe","modelframe",
 #     "backgroundcheckframe",NA,"backgroundentryframe1","backgroundentryframe2"),
@@ -131,7 +131,7 @@
 #  grid.rows <- .combine.rows(input=input,rows=c(2,3),title="Layer Specifications",
 #     border=TRUE,grid.rows=grid.rows,grid.config=grid.config)
 
-## ----newtool_script,eval=FALSE,echo=TRUE---------------------------------
+## ----newtool_script,eval=FALSE,echo=TRUE--------------------------------------
 #  newtool_WINDOW <- function(methodname){
 #  	
 #  	new.frames <- .initialize.new.frames()
@@ -170,7 +170,7 @@
 #  	   grid.rows=grid.rows,new.frames=new.frames)
 #  }
 
-## ----bcdiag_script,eval=FALSE,echo=TRUE----------------------------------
+## ----bcdiag_script,eval=FALSE,echo=TRUE---------------------------------------
 #  bcdiag_WINDOW <- function(methodname){
 #  	
 #  	new.frames <- .initialize.new.frames()
