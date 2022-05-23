@@ -1,4 +1,4 @@
-0691180229b21926884a0b5492fb39f7 *DESCRIPTION
+dbc0fd1726e7532c77d6ff096614fcbd *DESCRIPTION
 d2c72ace84b0f513fd10da0542b14dcf *NAMESPACE
 f91769278812d8635a4726fd88e77c25 *NEWS
 ffe1dc9824f76f68a177eb5020f8444b *R/BicARE_WIN.R
@@ -55,7 +55,7 @@ fc8ef6e70d275070f796cef8b9506e93 *R/ssvd_WIN.R
 90854711028cebb9a5e42ac14f36c931 *build/vignette.rds
 a4b66d41e19e4ea33fdf0eda3dedb5d6 *inst/doc/GuideBiclustGUI.R
 bb04603d6a3587e9a1e3827f068eedfc *inst/doc/GuideBiclustGUI.Rnw
-5a52cc0139c30dcd3d59f9bdab9019ec *inst/doc/GuideBiclustGUI.pdf
+d9e12e03d6c50a3cca2813a5078820cc *inst/doc/GuideBiclustGUI.pdf
 efc551afee5f732165a39c33d99384fa *inst/etc/menus.txt
 8b50b08a79e3311567b5458808817484 *inst/scripts/frames_script.R
 297459c54eac9014a5b5ad4744ed4336 *inst/scripts/installation_script.R
